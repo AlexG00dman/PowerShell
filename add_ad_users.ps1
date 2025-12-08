@@ -1,5 +1,5 @@
 #PowerShell
-#Script for restore old ad_users (students) to ad ver 0.59.5 bug fixed
+#Script for restore old ad_users (students) to ad ver 0.60 bug fixed
 #Запускать с edu_dom 
 #csv_students_source
 $csv = Import-Csv "C:\temp\new070524.csv" -Delimiter ';' -Encoding UTF8
@@ -128,7 +128,7 @@ function set_acl() {
 }
 
 
-
+####move folder
 function move_folder{
     param ([string]$stud_id, [string]$home_dir)   
     $ad_home_dir = $(Get-ADUser -Identity $stud_id -Server $ad_server -Properties HomeDirectory | Select-Object -ExpandProperty HomeDirectory)
@@ -138,11 +138,18 @@ function move_folder{
             create_folder -home_dir $home_dir
     }
     #if ad_home != home_dir
+
     elseif ($ad_home_dir.ToString().trim() -ne $home_dir){
         if (Test-Path $ad_home_dir){
             #### Write-Output "$ad_home_dir status 0" debug # #create
-            Move-Item $ad_home_dir -Destination $home_dir -Force 
-            Write-host "folder $stud_id moved socessfully"
+
+            if (Test-Path $home_dir){
+                Move-Item $ad_home_dir -Destination $home_dir -Force 
+                Write-host "folder $stud_id moved socessfully"
+            }
+            else {
+                create_folder -home_dir $home_dir
+            }
         } else {
             create_folder -home_dir $home_dir
         }
@@ -154,6 +161,7 @@ function move_folder{
         }
         else {
             Write-Output "folder of $stud_id is on correct way :D"
+         
         }
     }
 
