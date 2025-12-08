@@ -1,5 +1,5 @@
 #PowerShell
-#Script for restore old ad_users (students) to ad ver 0.59.01 bug fixed
+#Script for restore old ad_users (students) to ad ver 0.59.5 bug fixed
 #Запускать с edu_dom 
 #csv_students_source
 $csv = Import-Csv "C:\temp\new070524.csv" -Delimiter ';' -Encoding UTF8
