@@ -131,17 +131,39 @@ function create_home_dir {
 }
 
 ####set acl for user forlder
-function set_acl{
+function set_acl() {
+    param ([string]$stud_id,[string]$home_dir)
 
-$acl = Get-Acl -Path $home_dir
-$new = "$ad_serv\$stud_id","Modify","ContainerInherit,ObjectInherit","None","Allow"
+    if (-not (Test-Path -Path $home_dir)) {
+        Write-Output "ERROR: студент пропущен: $stud_id; папка в системе не найдена: $home_dir"
+        return
+    }
 
-$accessRule = new-object System.Security.AccessControl.FileSystemAccessRule $new
-$acl.SetAccessRule($accessRule)
-Set-Acl -Path $home_dir -AclObject $acl
-Write-output "$stud_id acl ok"
+    try {
+        $acl = Get-Acl -Path $home_dir -ErrorAction Stop
+
+        $rights      = [System.Security.AccessControl.FileSystemRights]::Modify
+        $inherit     = [System.Security.AccessControl.InheritanceFlags] "ContainerInherit, ObjectInherit"
+        $propagation = [System.Security.AccessControl.PropagationFlags]::None
+        $type        = [System.Security.AccessControl.AccessControlType]::Allow
+
+        $accessRule = New-Object System.Security.AccessControl.FileSystemAccessRule(
+            "$ad_server\$stud_id",
+            $rights,
+            $inherit,
+            $propagation,
+            $type
+        )
+
+        $acl.SetAccessRule($accessRule)
+        Set-Acl -Path $home_dir -AclObject $acl -ErrorAction Stop
+
+        Write-Output "студент: $stud_id; home_dir: $home_dir права успешно назначены"
+    }
+    catch {
+        Write-Output "ERROR: $stud_id acl failed on $home_dir : $($_.Exception.Message)"
+    }
 }
-
 
 
 function set_homedrive_link{
