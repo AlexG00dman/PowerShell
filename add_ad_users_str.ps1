@@ -1,5 +1,5 @@
 #PowerShell
-#Script for restore old ad_users (students) to ad ver 0.59 FORK 
+#Script for restore old ad_users (students) to ad ver 0.59.1 str_fork 
 
 #student info
 $str_student = "152218;Фамилия Имя Отчество;Институт б1-группа-21 2022_2027(годы обучения);17061998 (дата_рождения);z_(форма_обучения)"
@@ -15,7 +15,7 @@ $inst_list = "ЭН", "ИнMЭТ", "ММТ", "ТИ", "УMС", "ИНТ", "ИНП"
 $ou_users = "CN=Users,DC=edudom"
 $ou_deleted = "OU=Удалённые,DC=edudom"
 $ou_inpit = "OU=App-EDU,DC=edudom"
-$ou_sei = "OU=OU-Users,OU=SE-EDU,DC=edudom"
+#$ou_sei = "OU=OU-Users,OU=SE-EDU,DC=edudom"
 
 
 #student split string
@@ -254,13 +254,13 @@ function move_user_to_inst_container{
             Move-ADObject -Server $ad_serv -Identity:$Aduser.DistinguishedName -TargetPath: $ou_inpit
             Write-Output "user: $stud_id moved to container $ou_inpit"
         }
-    } elseif ($inst_abbr -eq $inst_list[5]) {
-        if ($Aduser.DistinguishedName.Contains($ou_sei)) {
-            Write-Output "user: $stud_id have container 'EI-EDU' yet"
-        } else {
-            Move-ADObject -Server $ad_serv -Identity:$Aduser.DistinguishedName -TargetPath: $ou_sei
-            Write-Output "user: $stud_id moved to container 'EI-EDU'"
-        }
+#    } elseif ($inst_abbr -eq $inst_list[5]) {
+#        if ($Aduser.DistinguishedName.Contains($ou_sei)) {
+#            Write-Output "user: $stud_id have container 'EI-EDU' yet"
+#        } else {
+#            Move-ADObject -Server $ad_serv -Identity:$Aduser.DistinguishedName -TargetPath: $ou_sei
+#            Write-Output "user: $stud_id moved to container 'EI-EDU'"
+#        }
     } else {
         ##something not recognized ...."
     }
