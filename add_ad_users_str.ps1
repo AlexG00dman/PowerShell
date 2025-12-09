@@ -315,26 +315,36 @@ function set_new_status{
 
 
 function check_user{
+    param (
+        [string]$stud_id,
+        [string]$full_name,
+        [string]$description,
+	    [string]$pass,
+        [string]$home_dir      
+    )
+
+    $home_dir="$home_dir$stud_id"
+
 
     try {
-        $Aduser = Get-ADUser -server $ad_serv -Identity $stud_id
+        $Aduser = Get-ADUser -server $ad_server -Identity $stud_id
         if ($Aduser) {
-            #$ad_user_desc = Get-ADUser -Server $ad_serv -Identity $stud_id -Properties Description | Select-Object Description
-        #call function create user
-		    
-        restore_user 
-       # } else {
+            #$ad_user_desc = Get-ADUser -Server $ad_server -Identity $stud_id -Properties Description | Select-Object Description
+            #call function restore_user
+            restore_user -stud_id $stud_id -full_name $full_name -description $description -pass $pass -home_dir $home_dir
+        } #else {
             #call function create_user
-            #Write-Output "user $stud_id is New!"
-            #create_new_user -stud_id $stud_id -full_name $full_name -description $description -pass $pass -home_dir $home_dir
-        }
+        #    Write-Output "user $stud_id is New!"
+        #    create_new_user -stud_id $stud_id -full_name $full_name -description $description -pass $pass -home_dir $home_dir
+        #}
+    } catch [Microsoft.ActiveDirectory.Management.ADIdentityNotFoundException] {
+        Write-Output "user $stud_id is New!"
+        create_new_user -stud_id $stud_id -full_name $full_name -description $description -pass $pass -home_dir $home_dir
     } catch {
-      #Write-Output $_
-      #something happened ...
-	   #call function restore_user
-       Write-Output "user $stud_id exist in ad!"
-       create_new_user 
-       }
+        Write-Output $_
+        #something happened ... 
+    }
+
 }
 
 
